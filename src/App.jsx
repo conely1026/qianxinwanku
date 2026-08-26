@@ -3,9 +3,10 @@ import { BottomNav } from './components/BottomNav'
 import { Icon } from './components/Icons'
 import { ReleaseNotesModal } from './components/ReleaseNotesModal'
 import { SettingsModal } from './components/SettingsModal'
-import { DEFAULT_STATE, usePersistentState } from './hooks/usePersistentState'
+import { DEFAULT_STATE, STORAGE_KEY, usePersistentState } from './hooks/usePersistentState'
 import { appendConversionItem, removeConversionItem, replaceConversionItem } from './lib/conversionItems'
-import { CURRENT_RELEASE, RELEASE_SEEN_STORAGE_KEY, shouldShowReleaseNotes } from './lib/releaseNotes'
+import { rebaseLeaveSessionPeriod, reconcileLeaveSession } from './lib/leaveSession'
+import { CURRENT_RELEASE, getUnseenReleases, RELEASE_SEEN_STORAGE_KEY } from './lib/releaseNotes'
 import { dateKey, isDefaultWorkday } from './lib/time'
 import { CalendarView } from './views/CalendarView'
 import { ConvertView } from './views/ConvertView'
@@ -19,11 +20,13 @@ const VIEW_TITLES = {
   profile: '我的',
 }
 
-function hasUnseenRelease() {
+function readUnseenReleases() {
   try {
-    return shouldShowReleaseNotes(window.localStorage.getItem(RELEASE_SEEN_STORAGE_KEY))
+    const lastSeenReleaseId = window.localStorage.getItem(RELEASE_SEEN_STORAGE_KEY)
+    const hasExistingAppData = window.localStorage.getItem(STORAGE_KEY) !== null
+    return getUnseenReleases(lastSeenReleaseId, { includeAllWhenUnseen: hasExistingAppData })
   } catch {
-    return true
+    return [CURRENT_RELEASE]
   }
 }
 
@@ -34,12 +37,19 @@ export function App() {
   const [now, setNow] = useState(() => new Date())
   const [calendarCursor, setCalendarCursor] = useState(() => new Date())
   const [toast, setToast] = useState('')
-  const [releaseNotesOpen, setReleaseNotesOpen] = useState(hasUnseenRelease)
+  const [unseenReleases, setUnseenReleases] = useState(readUnseenReleases)
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000)
     return () => window.clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    setData((current) => {
+      const leaveSession = reconcileLeaveSession(current.leaveSession, now, current.settings)
+      return leaveSession === current.leaveSession ? current : { ...current, leaveSession }
+    })
+  }, [now, setData])
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -65,9 +75,10 @@ export function App() {
 
   const toggleLeave = useCallback(() => {
     setData((current) => {
-      const session = current.leaveSession
+      const actionTime = new Date()
+      const session = reconcileLeaveSession(current.leaveSession, actionTime, current.settings)
       if (session.running) {
-        const live = Math.max(0, Math.floor((Date.now() - session.startedAt) / 1000))
+        const live = Math.max(0, Math.floor((actionTime.getTime() - session.startedAt) / 1000))
         return {
           ...current,
           leaveSession: {
@@ -79,13 +90,17 @@ export function App() {
       }
       return {
         ...current,
-        leaveSession: { ...session, running: true, startedAt: Date.now() },
+        leaveSession: { ...session, running: true, startedAt: actionTime.getTime() },
       }
     })
   }, [setData])
 
   const saveSettings = useCallback((settings) => {
-    setData((current) => ({ ...current, settings }))
+    setData((current) => ({
+      ...current,
+      settings,
+      leaveSession: rebaseLeaveSessionPeriod(current.leaveSession, new Date(), settings),
+    }))
     setSettingsOpen(false)
     setToast('参数已保存在本机')
   }, [setData])
@@ -128,7 +143,7 @@ export function App() {
     } catch {
       // The announcement can still be dismissed for this session when storage is unavailable.
     }
-    setReleaseNotesOpen(false)
+    setUnseenReleases([])
   }, [])
 
   function resetData() {
@@ -197,8 +212,8 @@ export function App() {
       />
 
       <ReleaseNotesModal
-        open={releaseNotesOpen}
-        release={CURRENT_RELEASE}
+        open={unseenReleases.length > 0}
+        releases={unseenReleases}
         onClose={dismissReleaseNotes}
       />
 

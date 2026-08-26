@@ -138,10 +138,18 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 28px; }
 .confirm-actions .danger-button { min-height: 48px; background: #8f2e26; color: white; border-color: #702019; }
 .release-backdrop { background: rgba(17, 24, 16, .55); }
-.release-modal { width: min(490px, 100%); padding: 30px; border: 2px solid var(--ink); border-radius: 25px; background: white; box-shadow: 0 30px 80px rgba(0,0,0,.3); animation: modal-in .22s ease; }
+.release-modal { width: min(490px, 100%); max-height: calc(100vh - 32px); padding: 30px; display: flex; flex-direction: column; overflow: hidden; border: 2px solid var(--ink); border-radius: 25px; background: white; box-shadow: 0 30px 80px rgba(0,0,0,.3); animation: modal-in .22s ease; }
 .release-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .release-label { padding: 6px 9px; border: 1px solid var(--ink); border-radius: 999px; color: #4c5548; font: 700 10px/1 var(--mono); letter-spacing: .12em; }
-.release-modal h2 { margin: 22px 0 20px; font: 900 31px/1.1 var(--serif); }
+.release-modal h2 { margin: 22px 0 16px; font: 900 31px/1.1 var(--serif); }
+.release-page-toolbar { min-height: 36px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.release-page-toolbar > strong { color: #596252; font: 800 11px/1 var(--mono); letter-spacing: .08em; }
+.release-pagination { display: flex; align-items: center; gap: 8px; }
+.release-pagination button { width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: white; color: var(--ink); cursor: pointer; }
+.release-pagination button:hover:not(:disabled) { border-color: var(--ink); background: var(--soft); }
+.release-pagination button:disabled { opacity: .32; cursor: default; }
+.release-pagination span { min-width: 36px; color: #596252; text-align: center; font: 800 11px/1 var(--mono); }
+.release-scroll { min-height: 0; overflow-y: auto; padding-right: 5px; overscroll-behavior: contain; }
 .release-list { margin: 0; padding: 0; list-style: none; }
 .release-list li { display: grid; grid-template-columns: 30px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
 .release-list li > span { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; background: var(--acid); color: var(--ink); }

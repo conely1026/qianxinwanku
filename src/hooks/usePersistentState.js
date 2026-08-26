@@ -30,6 +30,7 @@ export const DEFAULT_STATE = {
     running: false,
     startedAt: null,
     accumulatedSeconds: 0,
+    periodStartedAt: null,
   },
   headphone: {
     price: 1299,

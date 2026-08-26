@@ -1,4 +1,5 @@
 import { Icon } from './Icons'
+import { reconcileLeaveSession } from '../lib/leaveSession'
 import { formatDuration, formatMoney, getRates } from '../lib/time'
 
 export function getLeaveSeconds(session, now) {
@@ -9,7 +10,8 @@ export function getLeaveSeconds(session, now) {
 }
 
 export function LeaveTimer({ session, now, settings, onToggle, compact = false }) {
-  const seconds = getLeaveSeconds(session, now)
+  const activeSession = reconcileLeaveSession(session, now, settings)
+  const seconds = getLeaveSeconds(activeSession, now)
   const value = seconds * getRates(settings).second
 
   return (
@@ -17,7 +19,7 @@ export function LeaveTimer({ session, now, settings, onToggle, compact = false }
       <div>
         <p className="micro-label">PAID BREAK</p>
         <h3>带薪离席</h3>
-        <p className="muted">离开工位也在计价，看看这段时间值多少。</p>
+        <p className="muted">离开工位也在计价，每天到下次上班（{settings.startTime}）自动清零。</p>
       </div>
       <div className="leave-state">
         <div>
@@ -25,8 +27,8 @@ export function LeaveTimer({ session, now, settings, onToggle, compact = false }
           {seconds ? <span>{formatMoney(value)}</span> : null}
         </div>
         <button className="dark-button timer-button" type="button" onClick={onToggle}>
-          <Icon name={session.running ? 'pause' : 'play'} size={18} />
-          {session.running ? '暂停计时' : seconds ? '继续计时' : '开始计时'}
+          <Icon name={activeSession.running ? 'pause' : 'play'} size={18} />
+          {activeSession.running ? '暂停计时' : seconds ? '继续计时' : '开始计时'}
         </button>
       </div>
     </section>
