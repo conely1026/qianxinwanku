@@ -4,6 +4,8 @@ const CURRENCY = new Intl.NumberFormat('zh-CN', {
   minimumFractionDigits: 2,
 })
 
+const MINUTES_PER_DAY = 24 * 60
+
 export function parseTime(value) {
   const [hours = 0, minutes = 0] = String(value).split(':').map(Number)
   return hours * 60 + minutes
@@ -16,9 +18,36 @@ export function timeOnDate(date, value) {
   return result
 }
 
+export function getScheduleMinutes(settings) {
+  const start = parseTime(settings.startTime)
+  const endDayOffset = Number(settings.endDayOffset) === 1 ? 1 : 0
+  const end = parseTime(settings.endTime) + endDayOffset * MINUTES_PER_DAY
+  const normalizeAfterStart = (minutes) => (
+    endDayOffset === 1 && minutes < start ? minutes + MINUTES_PER_DAY : minutes
+  )
+
+  return {
+    start,
+    end,
+    endDayOffset,
+    lunchStart: normalizeAfterStart(parseTime(settings.lunchStart)),
+    lunchEnd: normalizeAfterStart(parseTime(settings.lunchEnd)),
+  }
+}
+
+export function isValidSchedule(settings) {
+  const { start, end, lunchStart, lunchEnd } = getScheduleMinutes(settings)
+  return [start, end, lunchStart, lunchEnd].every(Number.isFinite)
+    && end > start
+    && lunchStart >= start
+    && lunchEnd > lunchStart
+    && lunchEnd <= end
+}
+
 export function paidMinutesPerDay(settings) {
-  const shift = parseTime(settings.endTime) - parseTime(settings.startTime)
-  const lunch = Math.max(0, parseTime(settings.lunchEnd) - parseTime(settings.lunchStart))
+  const { start, end, lunchStart, lunchEnd } = getScheduleMinutes(settings)
+  const shift = end - start
+  const lunch = Math.max(0, lunchEnd - lunchStart)
   return Math.max(1, shift - lunch)
 }
 
@@ -55,11 +84,20 @@ export function isWorkday(date, attendance = {}) {
 }
 
 export function getWorkSnapshot(now, settings, attendance = {}) {
-  const start = timeOnDate(now, settings.startTime)
-  const end = timeOnDate(now, settings.endTime)
-  const lunchStart = timeOnDate(now, settings.lunchStart)
-  const lunchEnd = timeOnDate(now, settings.lunchEnd)
-  const workday = isWorkday(now, attendance)
+  const schedule = getScheduleMinutes(settings)
+  const currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60
+  const continuesPreviousDay = schedule.endDayOffset === 1 && currentMinutes < parseTime(settings.endTime)
+  const shiftDate = new Date(now)
+  if (continuesPreviousDay) shiftDate.setDate(shiftDate.getDate() - 1)
+
+  const start = timeOnDate(shiftDate, settings.startTime)
+  const end = timeOnDate(shiftDate, settings.endTime)
+  end.setDate(end.getDate() + schedule.endDayOffset)
+  const lunchStart = timeOnDate(shiftDate, settings.lunchStart)
+  lunchStart.setDate(lunchStart.getDate() + Math.floor(schedule.lunchStart / MINUTES_PER_DAY))
+  const lunchEnd = timeOnDate(shiftDate, settings.lunchEnd)
+  lunchEnd.setDate(lunchEnd.getDate() + Math.floor(schedule.lunchEnd / MINUTES_PER_DAY))
+  const workday = isWorkday(shiftDate, attendance)
   const totalPaidSeconds = paidMinutesPerDay(settings) * 60
 
   let paidSeconds = 0
@@ -86,11 +124,11 @@ export function getWorkSnapshot(now, settings, attendance = {}) {
       statusDetail = '今天的时间已经到账'
     } else if (now >= lunchStart && now < lunchEnd) {
       status = '午休进行中'
-      statusDetail = '距离今天下班'
+      statusDetail = schedule.endDayOffset === 1 ? '距离本次下班' : '距离今天下班'
       countdownSeconds = Math.max(0, Math.floor((end - now) / 1000))
     } else {
       status = '工作计价中'
-      statusDetail = '距离今天下班'
+      statusDetail = schedule.endDayOffset === 1 ? '距离本次下班' : '距离今天下班'
       countdownSeconds = Math.max(0, Math.floor((end - now) / 1000))
     }
   }

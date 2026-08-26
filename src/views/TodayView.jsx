@@ -6,6 +6,7 @@ export function TodayView({ data, now, onLeaveToggle, onNavigate }) {
   const snapshot = getWorkSnapshot(now, data.settings, data.attendance)
   const rates = getRates(data.settings)
   const coffeeCount = snapshot.earnings / 15
+  const endDayLabel = Number(data.settings.endDayOffset) === 1 ? ' +1天' : ''
 
   return (
     <div className="view-stack today-view">
@@ -22,7 +23,7 @@ export function TodayView({ data, now, onLeaveToggle, onNavigate }) {
         <div className="shift-meter">
           <div className="meter-copy">
             <span>SHIFT {Math.round(snapshot.progress)}%</span>
-            <span>{data.settings.startTime}—{data.settings.endTime}</span>
+            <span>{data.settings.startTime}—{data.settings.endTime}{endDayLabel}</span>
           </div>
           <div className="meter-track" aria-label={`今日班次进度 ${Math.round(snapshot.progress)}%`}>
             <span style={{ width: `${snapshot.progress}%` }} />

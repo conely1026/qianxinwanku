@@ -114,13 +114,41 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 .conversion-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 76px; }
 .conversion-item { position: relative; min-height: 190px; padding: 26px 24px 24px 12px; border-top: 1px solid var(--line); content-visibility: auto; }
-.conversion-item > div { display: flex; justify-content: space-between; gap: 20px; }
+.conversion-item.is-editing { content-visibility: visible; }
+.conversion-heading { display: flex; justify-content: space-between; gap: 20px; padding-right: 28px; }
 .conversion-item h2 { margin: 0; font: 900 20px/1.1 var(--serif); }
-.conversion-item > div span { font: 14px/1 var(--mono); }
+.conversion-heading span { font: 14px/1 var(--mono); }
 .conversion-item > strong { display: block; margin: 35px 0 10px; font: 500 clamp(28px, 4vw, 43px)/1 var(--serif); }
 .conversion-item small { color: #a0a59b; }
-.delete-item { position: absolute; right: 2px; bottom: 29px; width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+.conversion-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.edit-item { flex: 0 0 auto; padding: 3px 0; border: 0; border-bottom: 1px solid var(--ink); background: none; font-size: 12px; font-weight: 800; cursor: pointer; }
+.delete-item { position: absolute; top: 18px; right: -4px; width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
 .delete-item:hover { background: #f1f1ec; }
+.conversion-edit-form { display: grid; grid-template-columns: minmax(0, 1fr) 140px; gap: 16px; padding: 2px 30px 0 0; }
+.conversion-edit-form label { display: flex; flex-direction: column; gap: 7px; }
+.conversion-edit-form label span { color: var(--muted); font-size: 12px; }
+.conversion-edit-form input { width: 100%; height: 46px; padding: 0 12px; border: 1px solid var(--line); border-radius: 9px; background: white; }
+.conversion-edit-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; }
+.conversion-edit-actions .dark-button { min-height: 42px; }
+.conversion-empty { grid-column: 1 / -1; margin: 0; padding: 42px 12px; border-top: 1px solid var(--line); color: var(--muted); text-align: center; }
+.confirm-modal { width: min(430px, 100%); padding: 32px; border: 2px solid var(--ink); border-radius: 24px; background: white; box-shadow: 0 30px 80px rgba(0,0,0,.3); animation: modal-in .2s ease; }
+.confirm-icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; background: #f5e9e7; color: #8f2e26; }
+.confirm-modal h2 { margin: 22px 0 10px; font: 900 25px/1.25 var(--serif); }
+.confirm-modal p { margin: 0; color: var(--muted); line-height: 1.6; }
+.confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 28px; }
+.confirm-actions .danger-button { min-height: 48px; background: #8f2e26; color: white; border-color: #702019; }
+.release-backdrop { background: rgba(17, 24, 16, .55); }
+.release-modal { width: min(490px, 100%); padding: 30px; border: 2px solid var(--ink); border-radius: 25px; background: white; box-shadow: 0 30px 80px rgba(0,0,0,.3); animation: modal-in .22s ease; }
+.release-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.release-label { padding: 6px 9px; border: 1px solid var(--ink); border-radius: 999px; color: #4c5548; font: 700 10px/1 var(--mono); letter-spacing: .12em; }
+.release-modal h2 { margin: 22px 0 20px; font: 900 31px/1.1 var(--serif); }
+.release-list { margin: 0; padding: 0; list-style: none; }
+.release-list li { display: grid; grid-template-columns: 30px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+.release-list li > span { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; background: var(--acid); color: var(--ink); }
+.release-list strong { display: block; font: 900 16px/1.3 var(--serif); }
+.release-list p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+.release-storage-note { margin: 15px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--soft); color: #566050; font-size: 12px; line-height: 1.5; }
+.release-acknowledge { width: 100%; margin-top: 18px; }
 
 .custom-item-form { margin-top: 22px; padding: 36px; border: 1px solid var(--line); border-radius: 22px; display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 18px; align-items: end; }
 .custom-form-title { display: flex; gap: 17px; align-items: center; }
@@ -188,6 +216,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .field span { color: var(--muted); font: 11px/1 var(--mono); letter-spacing: .08em; }
 .field input, .field select { width: 100%; height: 46px; padding: 0 13px; border: 1px solid transparent; border-bottom-color: var(--line); background: white; border-radius: 8px 8px 0 0; }
 .field input:hover, .field select:hover { background: #f7f8f3; }
+.time-with-offset { display: grid; grid-template-columns: minmax(0, 1fr) 88px; gap: 8px; }
+.field .day-offset-select { padding: 0 8px; color: var(--ink); font-weight: 800; }
+.field .field-hint { margin-top: -2px; color: var(--muted); font-size: 11px; line-height: 1.4; }
 .form-error { margin: 10px 0 0; color: #a0261d; font-size: 13px; }
 .modal-actions { display: grid; grid-template-columns: 100px 1fr; gap: 14px; margin-top: 24px; }
 .modal-actions .text-button { border-color: transparent; font-size: 16px; }
@@ -218,6 +249,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .editorial-intro h1 { font-size: clamp(43px, 13vw, 64px); }
   .conversion-grid { grid-template-columns: 1fr; }
   .conversion-item { min-height: 168px; }
+  .conversion-edit-form { grid-template-columns: 1fr; }
+  .conversion-edit-actions { grid-column: auto; }
   .custom-item-form { padding: 24px 20px; grid-template-columns: 1fr; }
   .calendar-header { align-items: flex-start; }
   .calendar-header h1 { font-size: 43px; }
@@ -249,6 +282,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 @media (max-width: 600px) {
   .metric-pair { grid-template-columns: 1fr; gap: 8px; }
+}
+
+@media (max-width: 480px) {
+  .time-settings-row { grid-template-columns: 1fr; gap: 0; }
+  .release-modal { padding: 24px 20px; border-radius: 22px; }
+  .release-modal h2 { margin-top: 18px; font-size: 27px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

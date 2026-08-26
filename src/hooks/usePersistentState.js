@@ -2,6 +2,15 @@ import { useCallback, useEffect, useState } from 'react'
 
 export const STORAGE_KEY = 'qianxinwanku:state:v1'
 
+export const DEFAULT_CONVERSION_ITEMS = [
+  { id: 'coffee', name: '一杯咖啡', price: 15 },
+  { id: 'lunch', name: '一顿午饭', price: 35 },
+  { id: 'movie', name: '一张电影票', price: 55 },
+  { id: 'show', name: '一场演出', price: 680 },
+  { id: 'sneakers', name: '一双球鞋', price: 899 },
+  { id: 'shoes', name: '球鞋', price: 699 },
+]
+
 export const DEFAULT_STATE = {
   version: 1,
   settings: {
@@ -9,12 +18,13 @@ export const DEFAULT_STATE = {
     workdays: 22,
     startTime: '09:00',
     endTime: '18:00',
+    endDayOffset: 0,
     lunchStart: '12:00',
     lunchEnd: '13:00',
     payday: 10,
     displayBasis: 'gross',
   },
-  customItems: [],
+  conversionItems: DEFAULT_CONVERSION_ITEMS,
   attendance: {},
   leaveSession: {
     running: false,
@@ -28,13 +38,29 @@ export const DEFAULT_STATE = {
   lastView: 'today',
 }
 
-function normalizeState(value) {
+function normalizeConversionItems(items) {
+  return items
+    .filter((item) => item && typeof item === 'object')
+    .map((item) => ({
+      id: String(item.id || crypto.randomUUID()),
+      name: String(item.name || '').trim(),
+      price: Number(item.price),
+    }))
+    .filter((item) => item.name && Number.isFinite(item.price) && item.price > 0)
+}
+
+export function normalizeState(value) {
   if (!value || typeof value !== 'object' || value.version !== 1) return DEFAULT_STATE
+  const legacyCustomItems = Array.isArray(value.customItems) ? value.customItems : []
+  const conversionItems = Array.isArray(value.conversionItems)
+    ? value.conversionItems
+    : [...DEFAULT_CONVERSION_ITEMS, ...legacyCustomItems]
+  const { customItems: _legacyCustomItems, ...currentValue } = value
   return {
     ...DEFAULT_STATE,
-    ...value,
+    ...currentValue,
     settings: { ...DEFAULT_STATE.settings, ...(value.settings || {}) },
-    customItems: Array.isArray(value.customItems) ? value.customItems : [],
+    conversionItems: normalizeConversionItems(conversionItems),
     attendance: value.attendance && typeof value.attendance === 'object' ? value.attendance : {},
     leaveSession: { ...DEFAULT_STATE.leaveSession, ...(value.leaveSession || {}) },
     headphone: { ...DEFAULT_STATE.headphone, ...(value.headphone || {}) },

@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { BottomNav } from './components/BottomNav'
 import { Icon } from './components/Icons'
+import { ReleaseNotesModal } from './components/ReleaseNotesModal'
 import { SettingsModal } from './components/SettingsModal'
 import { DEFAULT_STATE, usePersistentState } from './hooks/usePersistentState'
+import { appendConversionItem, removeConversionItem, replaceConversionItem } from './lib/conversionItems'
+import { CURRENT_RELEASE, RELEASE_SEEN_STORAGE_KEY, shouldShowReleaseNotes } from './lib/releaseNotes'
 import { dateKey, isDefaultWorkday } from './lib/time'
 import { CalendarView } from './views/CalendarView'
 import { ConvertView } from './views/ConvertView'
@@ -16,6 +19,14 @@ const VIEW_TITLES = {
   profile: '我的',
 }
 
+function hasUnseenRelease() {
+  try {
+    return shouldShowReleaseNotes(window.localStorage.getItem(RELEASE_SEEN_STORAGE_KEY))
+  } catch {
+    return true
+  }
+}
+
 export function App() {
   const [data, setData, replaceData] = usePersistentState()
   const [view, setView] = useState(data.lastView || 'today')
@@ -23,6 +34,7 @@ export function App() {
   const [now, setNow] = useState(() => new Date())
   const [calendarCursor, setCalendarCursor] = useState(() => new Date())
   const [toast, setToast] = useState('')
+  const [releaseNotesOpen, setReleaseNotesOpen] = useState(hasUnseenRelease)
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000)
@@ -89,6 +101,36 @@ export function App() {
     })
   }, [setData])
 
+  const addConversionItem = useCallback((item) => {
+    setData((current) => ({
+      ...current,
+      conversionItems: appendConversionItem(current.conversionItems, item),
+    }))
+  }, [setData])
+
+  const updateConversionItem = useCallback((item) => {
+    setData((current) => ({
+      ...current,
+      conversionItems: replaceConversionItem(current.conversionItems, item),
+    }))
+  }, [setData])
+
+  const deleteConversionItem = useCallback((id) => {
+    setData((current) => ({
+      ...current,
+      conversionItems: removeConversionItem(current.conversionItems, id),
+    }))
+  }, [setData])
+
+  const dismissReleaseNotes = useCallback(() => {
+    try {
+      window.localStorage.setItem(RELEASE_SEEN_STORAGE_KEY, CURRENT_RELEASE.id)
+    } catch {
+      // The announcement can still be dismissed for this session when storage is unavailable.
+    }
+    setReleaseNotesOpen(false)
+  }, [])
+
   function resetData() {
     if (!window.confirm('确定清空这台设备上的全部参数和统计吗？此操作无法撤销。')) return
     replaceData(DEFAULT_STATE)
@@ -101,8 +143,9 @@ export function App() {
     convert: (
       <ConvertView
         data={data}
-        onAddItem={(item) => setData((current) => ({ ...current, customItems: [...current.customItems, item] }))}
-        onDeleteItem={(id) => setData((current) => ({ ...current, customItems: current.customItems.filter((item) => item.id !== id) }))}
+        onAddItem={addConversionItem}
+        onUpdateItem={updateConversionItem}
+        onDeleteItem={deleteConversionItem}
       />
     ),
     calendar: (
@@ -151,6 +194,12 @@ export function App() {
         settings={data.settings}
         onClose={() => setSettingsOpen(false)}
         onSave={saveSettings}
+      />
+
+      <ReleaseNotesModal
+        open={releaseNotesOpen}
+        release={CURRENT_RELEASE}
+        onClose={dismissReleaseNotes}
       />
 
       {toast ? <div className="toast" role="status"><Icon name="check" size={17} />{toast}</div> : null}

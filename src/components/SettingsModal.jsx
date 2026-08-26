@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { isValidSchedule, parseTime } from '../lib/time'
 import { Icon } from './Icons'
 
 const FIELD_GROUPS = [
@@ -8,18 +9,13 @@ const FIELD_GROUPS = [
   ],
   [
     { key: 'startTime', label: '上班时间', type: 'time' },
-    { key: 'endTime', label: '下班时间', type: 'time' },
+    { key: 'endTime', label: '下班时间', type: 'time', supportsDayOffset: true },
   ],
   [
     { key: 'lunchStart', label: '午休开始', type: 'time' },
     { key: 'lunchEnd', label: '午休结束', type: 'time' },
   ],
 ]
-
-function toMinutes(value) {
-  const [hours, minutes] = String(value).split(':').map(Number)
-  return hours * 60 + minutes
-}
 
 export function SettingsModal({ open, settings, onClose, onSave }) {
   const [form, setForm] = useState(settings)
@@ -44,17 +40,19 @@ export function SettingsModal({ open, settings, onClose, onSave }) {
   if (!open) return null
 
   function update(key, value) {
-    setForm((current) => ({ ...current, [key]: value }))
+    setForm((current) => {
+      const next = { ...current, [key]: value }
+      if (key === 'endTime' && parseTime(value) <= parseTime(current.startTime)) {
+        next.endDayOffset = 1
+      }
+      return next
+    })
   }
 
   function submit(event) {
     event.preventDefault()
-    const start = toMinutes(form.startTime)
-    const end = toMinutes(form.endTime)
-    const lunchStart = toMinutes(form.lunchStart)
-    const lunchEnd = toMinutes(form.lunchEnd)
-    if (end <= start || lunchStart < start || lunchEnd > end || lunchEnd <= lunchStart) {
-      setError('请确认上下班和午休时间的先后顺序。')
+    if (!isValidSchedule(form)) {
+      setError('请确认时间顺序；跨午夜下班请选择“+1天”。')
       return
     }
     onSave({
@@ -62,6 +60,7 @@ export function SettingsModal({ open, settings, onClose, onSave }) {
       monthlySalary: Number(form.monthlySalary),
       workdays: Number(form.workdays),
       payday: Number(form.payday),
+      endDayOffset: Number(form.endDayOffset) === 1 ? 1 : 0,
     })
   }
 
@@ -77,17 +76,34 @@ export function SettingsModal({ open, settings, onClose, onSave }) {
 
         <form onSubmit={submit}>
           {FIELD_GROUPS.map((group) => (
-            <div className="settings-row" key={group[0].key}>
-              {group.map(({ key, label, ...inputProps }) => (
+            <div
+              className={`settings-row${group.some((field) => field.supportsDayOffset) ? ' time-settings-row' : ''}`}
+              key={group[0].key}
+            >
+              {group.map(({ key, label, supportsDayOffset, ...inputProps }) => (
                 <label className="field" key={key}>
                   <span>{label}</span>
-                  <input
-                    {...inputProps}
-                    aria-label={label}
-                    value={form[key]}
-                    onChange={(event) => update(key, event.target.value)}
-                    required
-                  />
+                  <div className={supportsDayOffset ? 'time-with-offset' : undefined}>
+                    <input
+                      {...inputProps}
+                      aria-label={label}
+                      value={form[key]}
+                      onChange={(event) => update(key, event.target.value)}
+                      required
+                    />
+                    {supportsDayOffset ? (
+                      <select
+                        className="day-offset-select"
+                        aria-label="下班日期"
+                        value={Number(form.endDayOffset) === 1 ? 1 : 0}
+                        onChange={(event) => update('endDayOffset', Number(event.target.value))}
+                      >
+                        <option value={0}>当天</option>
+                        <option value={1}>+1天</option>
+                      </select>
+                    ) : null}
+                  </div>
+                  {supportsDayOffset ? <small className="field-hint">凌晨下班请选择 +1天</small> : null}
                 </label>
               ))}
             </div>
