@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
 import { Icon } from '../components/Icons'
+import { ModalPortal } from '../components/ModalPortal'
 import { getRates } from '../lib/time'
 
 function formatWorkTime(minutes) {
@@ -19,7 +19,7 @@ function normalizeDraft(draft) {
   return name && Number.isFinite(price) && price > 0 ? { name, price } : null
 }
 
-export function ConvertView({ data, onAddItem, onUpdateItem, onDeleteItem }) {
+export function ConvertView({ data, modalTarget, onAddItem, onUpdateItem, onDeleteItem }) {
   const [draft, setDraft] = useState({ name: '', price: '' })
   const [editingId, setEditingId] = useState(null)
   const [editDraft, setEditDraft] = useState({ name: '', price: '' })
@@ -30,7 +30,7 @@ export function ConvertView({ data, onAddItem, onUpdateItem, onDeleteItem }) {
     event.preventDefault()
     const item = normalizeDraft(draft)
     if (!item) return
-    onAddItem({ id: crypto.randomUUID(), ...item })
+    onAddItem(item)
     setDraft({ name: '', price: '' })
   }
 
@@ -140,19 +140,21 @@ export function ConvertView({ data, onAddItem, onUpdateItem, onDeleteItem }) {
         <button className="dark-button" type="submit">加入换算</button>
       </form>
 
-      {pendingDeleteItem ? createPortal((
-        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setPendingDeleteItem(null)}>
-          <section className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-title">
-            <span className="confirm-icon"><Icon name="trash" size={24} /></span>
-            <h2 id="delete-confirm-title">删除“{pendingDeleteItem.name}”？</h2>
-            <p>删除后无法恢复，确定要继续吗？</p>
-            <div className="confirm-actions">
-              <button className="text-button" type="button" onClick={() => setPendingDeleteItem(null)}>取消</button>
-              <button className="danger-button" type="button" onClick={confirmDelete}>确认删除</button>
-            </div>
-          </section>
-        </div>
-      ), document.body) : null}
+      {pendingDeleteItem ? (
+        <ModalPortal target={modalTarget}>
+          <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setPendingDeleteItem(null)}>
+            <section className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-title">
+              <span className="confirm-icon"><Icon name="trash" size={24} /></span>
+              <h2 id="delete-confirm-title">删除“{pendingDeleteItem.name}”？</h2>
+              <p>删除后无法恢复，确定要继续吗？</p>
+              <div className="confirm-actions">
+                <button className="text-button" type="button" onClick={() => setPendingDeleteItem(null)}>取消</button>
+                <button className="danger-button" type="button" onClick={confirmDelete}>确认删除</button>
+              </div>
+            </section>
+          </div>
+        </ModalPortal>
+      ) : null}
     </div>
   )
 }

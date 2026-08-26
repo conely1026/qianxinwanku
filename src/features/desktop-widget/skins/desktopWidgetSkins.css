@@ -1,0 +1,47 @@
+.desktop-widget { box-sizing: border-box; color: #142117; font-family: Inter, "PingFang SC", sans-serif; user-select: none; }
+.desktop-widget button { color: inherit; font: inherit; }
+.desktop-widget [data-window-no-drag] { app-region: no-drag; -webkit-app-region: no-drag; }
+.desktop-widget[data-window-drag-region] { app-region: drag; -webkit-app-region: drag; }
+.desktop-widget button:focus-visible { outline: 2px solid #d8f300; outline-offset: 2px; }
+
+.desktop-widget-capsule { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 1fr auto; width: 360px; height: 76px; padding: 8px 9px 7px 13px; border: 1px solid rgb(255 255 255 / 42%); border-radius: 21px; background: rgb(20 33 23 / 93%); box-shadow: 0 14px 34px rgb(8 15 10 / 26%); color: #f5f7f0; backdrop-filter: blur(16px); }
+.desktop-widget-main-action { display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 0; border: 0; background: none; text-align: left; cursor: default; }
+.desktop-widget-main-action span:nth-child(2) { display: grid; gap: 2px; }
+.desktop-widget-main-action strong { font-size: 14px; }
+.desktop-widget-main-action small { overflow: hidden; color: #b6c0b3; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.desktop-widget-main-action b { font: 700 16px/1 Georgia, serif; }
+.desktop-widget-phase-dot { width: 8px; height: 8px; border-radius: 50%; background: #98a197; box-shadow: 0 0 0 4px rgb(255 255 255 / 7%); }
+.desktop-widget-phase-dot.is-working { background: #d8f300; }
+.desktop-widget-phase-dot.is-paid-leave { background: #f5af67; }
+.desktop-widget-phase-dot.is-lunch { background: #9dc7ef; }
+.desktop-widget-metrics { display: flex; gap: 12px; grid-column: 1; color: #b6c0b3; font: 10px/1.2 ui-monospace, monospace; }
+.desktop-widget-actions { display: flex; align-items: center; gap: 4px; grid-column: 2; grid-row: 1 / 3; margin-left: 9px; }
+.desktop-widget-actions button,
+.office-cat-actions button { position: relative; display: grid; width: 29px; height: 29px; padding: 0; place-items: center; border: 0; border-radius: 50%; background: rgb(255 255 255 / 9%); color: inherit; cursor: pointer; }
+.desktop-widget-actions button:hover,
+.office-cat-actions button:hover { background: rgb(216 243 0 / 22%); }
+.desktop-widget-release-count { position: absolute; top: -4px; right: -4px; display: grid; min-width: 16px; height: 16px; padding: 0 4px; place-items: center; border-radius: 8px; background: #d8f300; color: #142117; font: 700 9px/1 ui-monospace, monospace; }
+
+.desktop-widget-office-cat { position: relative; width: 360px; height: 76px; overflow: hidden; border: 1px solid rgb(118 88 63 / 42%); border-radius: 21px; background: rgb(247 241 231 / 97%); box-shadow: 0 13px 30px rgb(83 58 40 / 18%); color: #38271f; backdrop-filter: blur(14px); }
+.office-cat-scene { position: absolute; top: 1px; bottom: 1px; left: 2px; width: 76px; height: 72px; object-fit: contain; pointer-events: none; filter: drop-shadow(0 4px 4px rgb(83 58 40 / 12%)); }
+.office-cat-main-action { position: absolute; top: 7px; right: 73px; bottom: 7px; left: 80px; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr 4px; gap: 2px 8px; min-width: 0; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: default; }
+.office-cat-copy { min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: baseline; gap: 5px; }
+.office-cat-copy strong { font-size: 11px; white-space: nowrap; }
+.office-cat-copy small { overflow: hidden; color: #8a715e; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.office-cat-main-action b { color: #76583f; font: 700 12px/1.2 Georgia, serif; white-space: nowrap; }
+.office-cat-main-action em { grid-column: 1 / -1; align-self: center; color: #2e211b; font: normal 700 21px/1 ui-monospace, "Cascadia Mono", monospace; font-style: normal; letter-spacing: -.04em; }
+.office-cat-progress { grid-column: 1 / -1; grid-row: 3; display: block; overflow: hidden; border-radius: 999px; background: #e3d6c5; }
+.office-cat-progress i { display: block; height: 100%; border-radius: inherit; background: #8b6a50; }
+.office-cat-actions { position: absolute; top: 8px; right: 8px; bottom: 8px; display: grid; grid-template-columns: 29px 29px; align-content: center; gap: 4px; color: #624a39; }
+.office-cat-actions button { border: 1px solid rgb(118 88 63 / 30%); background: rgb(232 218 200 / 68%); }
+.office-cat-actions button:hover { background: #dcc7ad; }
+.desktop-widget-office-cat .desktop-widget-release-count { background: #76583f; color: #fffaf2; }
+.desktop-widget-office-cat button:focus-visible { outline-color: #76583f; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .desktop-widget-office-cat.is-working .office-cat-scene { animation: office-cat-work-bob 1.6s steps(2, end) infinite; }
+  .desktop-widget-office-cat.is-paid-leave .office-cat-scene { animation: office-cat-leave 650ms ease-out both; }
+}
+
+@keyframes office-cat-work-bob { 50% { transform: translateY(2px) rotate(.25deg); } }
+@keyframes office-cat-leave { from { transform: translateX(-8px); opacity: .65; } to { transform: none; opacity: 1; } }

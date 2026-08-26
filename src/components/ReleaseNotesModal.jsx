@@ -1,8 +1,15 @@
-import { createPortal } from 'react-dom'
 import { useState } from 'react'
 import { Icon } from './Icons'
+import { ModalPortal } from './ModalPortal'
 
-export function ReleaseNotesModal({ open, releases, onClose }) {
+export function ReleaseNotesModal({
+  open,
+  releases,
+  modalTarget,
+  storageNote,
+  onDismiss,
+  onAcknowledge,
+}) {
   const [activeReleaseId, setActiveReleaseId] = useState(null)
   if (!open || !releases.length) return null
 
@@ -16,14 +23,15 @@ export function ReleaseNotesModal({ open, releases, onClose }) {
     setActiveReleaseId(releases[index].id)
   }
 
-  return createPortal((
-    <div className="modal-backdrop release-backdrop" role="presentation">
-      <section className="release-modal" role="dialog" aria-modal="true" aria-labelledby="release-title">
+  return (
+    <ModalPortal target={modalTarget}>
+      <div className="modal-backdrop release-backdrop" role="presentation">
+        <section className="release-modal" role="dialog" aria-modal="true" aria-labelledby="release-title">
         <header className="release-header">
           <span className="release-label">
             NEW / {multipleReleases ? 'RELEASE' : activeRelease.label}
           </span>
-          <button className="icon-button" type="button" aria-label="关闭更新说明" onClick={onClose}>
+          <button className="icon-button" type="button" aria-label="关闭更新说明" onClick={onDismiss}>
             <Icon name="close" size={20} />
           </button>
         </header>
@@ -69,9 +77,10 @@ export function ReleaseNotesModal({ open, releases, onClose }) {
           </section>
         </div>
 
-        <p className="release-storage-note">本次更新不会清空当前浏览器里的本机数据。</p>
-        <button className="primary-button release-acknowledge" type="button" onClick={onClose}>知道了</button>
-      </section>
-    </div>
-  ), document.body)
+          <p className="release-storage-note">{storageNote}</p>
+          <button className="primary-button release-acknowledge" type="button" onClick={onAcknowledge}>知道了</button>
+        </section>
+      </div>
+    </ModalPortal>
+  )
 }

@@ -1,13 +1,26 @@
 {
   "name": "qianxinwanku",
+  "productName": "千薪万苦",
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "dev:web": "vite",
+    "dev:desktop:renderer": "vite --config vite.desktop.config.js",
+    "start:desktop": "electron .",
+    "build": "npm run build:web",
+    "build:web": "vite build",
+    "build:desktop:renderer": "vite build --config vite.desktop.config.js",
+    "build:desktop:unpacked": "npm run build:desktop:renderer && electron-builder --dir --win",
+    "build:desktop:portable": "npm run build:desktop:renderer && electron-builder --win portable",
+    "verify:release-boundaries": "node tools/release/verify-release-boundaries.mjs",
+    "prepare:pages": "npm test && npm run build:web && node tools/release/verify-release-boundaries.mjs --web",
+    "prepare:desktop-release": "npm test && npm run build:desktop:portable && node tools/release/verify-release-boundaries.mjs --desktop",
     "preview": "vite preview",
-    "check": "vite build",
+    "preview:desktop": "vite preview --config vite.desktop.config.js",
+    "check": "npm run build:web && npm run build:desktop:renderer",
     "test": "node --test"
   },
   "dependencies": {
@@ -16,6 +29,36 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.0",
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
     "vite": "^8.2.2"
+  },
+  "build": {
+    "appId": "io.github.conely1026.qianxinwanku",
+    "productName": "千薪万苦",
+    "asar": true,
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist-desktop/**/*",
+      "electron/**/*",
+      "!electron/*.test.cjs",
+      "build/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "qianxinwanku-desktop-${version}-${arch}.${ext}"
+    }
   }
 }

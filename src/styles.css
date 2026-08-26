@@ -141,6 +141,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .release-modal { width: min(490px, 100%); max-height: calc(100vh - 32px); padding: 30px; display: flex; flex-direction: column; overflow: hidden; border: 2px solid var(--ink); border-radius: 25px; background: white; box-shadow: 0 30px 80px rgba(0,0,0,.3); animation: modal-in .22s ease; }
 .release-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .release-label { padding: 6px 9px; border: 1px solid var(--ink); border-radius: 999px; color: #4c5548; font: 700 10px/1 var(--mono); letter-spacing: .12em; }
+.release-unread-button { background: white; cursor: pointer; transition: background .18s ease, color .18s ease; }
+.release-unread-button:hover { background: var(--acid); color: var(--ink); }
 .release-modal h2 { margin: 22px 0 16px; font: 900 31px/1.1 var(--serif); }
 .release-page-toolbar { min-height: 36px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 .release-page-toolbar > strong { color: #596252; font: 800 11px/1 var(--mono); letter-spacing: .08em; }
@@ -156,6 +158,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .release-list strong { display: block; font: 900 16px/1.3 var(--serif); }
 .release-list p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
 .release-storage-note { margin: 15px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--soft); color: #566050; font-size: 12px; line-height: 1.5; }
+.state-error-screen { max-width: 680px; margin: 15vh auto; padding: 48px; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); box-shadow: 0 24px 70px rgb(21 37 25 / 10%); }
+.state-error-screen h1 { margin: 12px 0 18px; font: 700 clamp(34px, 6vw, 58px)/1.05 var(--serif); }
+.state-error-screen p:not(.micro-label) { margin: 0 0 26px; color: var(--muted); line-height: 1.8; }
 .release-acknowledge { width: 100%; margin-top: 18px; }
 
 .custom-item-form { margin-top: 22px; padding: 36px; border: 1px solid var(--line); border-radius: 22px; display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 18px; align-items: end; }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { isValidSchedule, parseTime } from '../lib/time'
 import { Icon } from './Icons'
+import { ModalPortal } from './ModalPortal'
 
 const FIELD_GROUPS = [
   [
@@ -17,7 +18,7 @@ const FIELD_GROUPS = [
   ],
 ]
 
-export function SettingsModal({ open, settings, onClose, onSave }) {
+export function SettingsModal({ open, settings, keyboardTarget, modalTarget, onClose, onSave }) {
   const [form, setForm] = useState(settings)
   const [error, setError] = useState('')
 
@@ -29,13 +30,13 @@ export function SettingsModal({ open, settings, onClose, onSave }) {
   }, [open, settings])
 
   useEffect(() => {
-    if (!open) return undefined
+    if (!open || !keyboardTarget?.addEventListener) return undefined
     function handleKey(event) {
       if (event.key === 'Escape') onClose()
     }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [open, onClose])
+    keyboardTarget.addEventListener('keydown', handleKey)
+    return () => keyboardTarget.removeEventListener('keydown', handleKey)
+  }, [keyboardTarget, open, onClose])
 
   if (!open) return null
 
@@ -65,8 +66,9 @@ export function SettingsModal({ open, settings, onClose, onSave }) {
   }
 
   return (
-    <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <section className="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <ModalPortal target={modalTarget}>
+      <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+        <section className="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <header className="modal-header">
           <h2 id="settings-title">工作参数</h2>
           <button className="icon-button" type="button" aria-label="关闭工作参数" onClick={onClose}>
@@ -130,7 +132,8 @@ export function SettingsModal({ open, settings, onClose, onSave }) {
             <button className="primary-button" type="submit">保存参数</button>
           </div>
         </form>
-      </section>
-    </div>
+        </section>
+      </div>
+    </ModalPortal>
   )
 }

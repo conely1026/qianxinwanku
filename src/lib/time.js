@@ -6,6 +6,14 @@ const CURRENCY = new Intl.NumberFormat('zh-CN', {
 
 const MINUTES_PER_DAY = 24 * 60
 
+export const WORK_PHASES = Object.freeze({
+  REST_DAY: 'rest-day',
+  BEFORE_WORK: 'before-work',
+  WORKING: 'working',
+  LUNCH: 'lunch',
+  AFTER_WORK: 'after-work',
+})
+
 export function parseTime(value) {
   const [hours = 0, minutes = 0] = String(value).split(':').map(Number)
   return hours * 60 + minutes
@@ -83,12 +91,34 @@ export function isWorkday(date, attendance = {}) {
   return isDefaultWorkday(date)
 }
 
+export function getNextActualShiftStart(now, settings, attendance = {}) {
+  const shiftDate = new Date(now)
+  const todayStart = timeOnDate(shiftDate, settings.startTime)
+  if (todayStart <= now) shiftDate.setDate(shiftDate.getDate() + 1)
+
+  while (!isWorkday(shiftDate, attendance)) {
+    shiftDate.setDate(shiftDate.getDate() + 1)
+  }
+
+  return timeOnDate(shiftDate, settings.startTime)
+}
+
+export function shouldShowWorkCountdown(phase) {
+  return phase === WORK_PHASES.WORKING || phase === WORK_PHASES.LUNCH
+}
+
 export function getWorkSnapshot(now, settings, attendance = {}) {
   const schedule = getScheduleMinutes(settings)
   const currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60
   const continuesPreviousDay = schedule.endDayOffset === 1 && currentMinutes < parseTime(settings.endTime)
   const shiftDate = new Date(now)
-  if (continuesPreviousDay) shiftDate.setDate(shiftDate.getDate() - 1)
+  if (continuesPreviousDay) {
+    const previousShiftDate = new Date(now)
+    previousShiftDate.setDate(previousShiftDate.getDate() - 1)
+    if (isWorkday(previousShiftDate, attendance)) {
+      shiftDate.setDate(shiftDate.getDate() - 1)
+    }
+  }
 
   const start = timeOnDate(shiftDate, settings.startTime)
   const end = timeOnDate(shiftDate, settings.endTime)
@@ -114,19 +144,24 @@ export function getWorkSnapshot(now, settings, attendance = {}) {
   let status = '今日休息'
   let statusDetail = '今天不必为时间标价'
   let countdownSeconds = 0
+  let phase = WORK_PHASES.REST_DAY
   if (workday) {
     if (now < start) {
+      phase = WORK_PHASES.BEFORE_WORK
       status = '等待开工'
-      statusDetail = '距离今天上班'
+      statusDetail = '还没到上班时间'
       countdownSeconds = Math.max(0, Math.floor((start - now) / 1000))
     } else if (now >= end) {
+      phase = WORK_PHASES.AFTER_WORK
       status = '今日已下班'
       statusDetail = '今天的时间已经到账'
     } else if (now >= lunchStart && now < lunchEnd) {
+      phase = WORK_PHASES.LUNCH
       status = '午休进行中'
-      statusDetail = schedule.endDayOffset === 1 ? '距离本次下班' : '距离今天下班'
-      countdownSeconds = Math.max(0, Math.floor((end - now) / 1000))
+      statusDetail = '距离午休结束'
+      countdownSeconds = Math.max(0, Math.floor((lunchEnd - now) / 1000))
     } else {
+      phase = WORK_PHASES.WORKING
       status = '工作计价中'
       statusDetail = schedule.endDayOffset === 1 ? '距离本次下班' : '距离今天下班'
       countdownSeconds = Math.max(0, Math.floor((end - now) / 1000))
@@ -134,9 +169,11 @@ export function getWorkSnapshot(now, settings, attendance = {}) {
   }
 
   return {
+    phase,
     status,
     statusDetail,
     workday,
+    nextActualShiftStart: getNextActualShiftStart(now, settings, attendance),
     paidSeconds,
     totalPaidSeconds,
     progress: Math.min(100, Math.max(0, (paidSeconds / totalPaidSeconds) * 100)),

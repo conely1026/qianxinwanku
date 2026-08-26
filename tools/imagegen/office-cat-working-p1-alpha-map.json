@@ -1,0 +1,13 @@
+{
+  "target_size": 512,
+  "default_occupy": 0.94,
+  "checker_colors": null,
+  "icons": [
+    {
+      "name": "office-cat-working-p1-round-paws-v3-rgba.png",
+      "source": "office-cat-working-p1-round-paws-v3.png",
+      "kind": "topbar",
+      "occupy": 0.94
+    }
+  ]
+}

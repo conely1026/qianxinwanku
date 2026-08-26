@@ -1,0 +1,31 @@
+{
+  "target_size": 512,
+  "default_occupy": 0.94,
+  "checker_colors": null,
+  "icons": [
+    {
+      "name": "office-cat-leave-skateboard-v4.png",
+      "source": "office-cat-leave-v4-draft.png",
+      "kind": "topbar",
+      "occupy": 0.94
+    },
+    {
+      "name": "office-cat-lunch-keyboard-v4.png",
+      "source": "office-cat-lunch-v4-draft.png",
+      "kind": "topbar",
+      "occupy": 0.94
+    },
+    {
+      "name": "office-cat-after-work-car-v4.png",
+      "source": "office-cat-after-work-v4-draft.png",
+      "kind": "topbar",
+      "occupy": 0.94
+    },
+    {
+      "name": "office-cat-rest-day-gaming-v4.png",
+      "source": "office-cat-rest-day-v4-draft.png",
+      "kind": "topbar",
+      "occupy": 0.94
+    }
+  ]
+}

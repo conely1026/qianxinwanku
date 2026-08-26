@@ -9,16 +9,16 @@ export function getLeaveSeconds(session, now) {
   return Number(session.accumulatedSeconds || 0) + live
 }
 
-export function LeaveTimer({ session, now, settings, onToggle, compact = false }) {
-  const activeSession = reconcileLeaveSession(session, now, settings)
+export function LeaveTimer({ session, now, settings, attendance, onToggle, compact = false }) {
+  const activeSession = reconcileLeaveSession(session, now, settings, attendance)
   const seconds = getLeaveSeconds(activeSession, now)
   const value = seconds * getRates(settings).second
 
   return (
     <section className={`leave-timer ${compact ? 'is-compact' : ''}`}>
       <div>
-        <p className="micro-label">PAID BREAK</p>
-        <h3>带薪离席</h3>
+        <p className="micro-label">LEAVE</p>
+        <h3>离席</h3>
         <p className="muted">离开工位也在计价，每天到下次上班（{settings.startTime}）自动清零。</p>
       </div>
       <div className="leave-state">

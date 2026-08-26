@@ -1,37 +1,23 @@
-import { useRef } from 'react'
 import { Icon } from '../components/Icons'
 import { LeaveTimer } from '../components/LeaveTimer'
 import { countWorkdays, formatMoney, getRates } from '../lib/time'
 
-function downloadJson(data) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
-  anchor.href = url
-  anchor.download = `千薪万苦-本地数据-${new Date().toISOString().slice(0, 10)}.json`
-  anchor.click()
-  URL.revokeObjectURL(url)
-}
-
-export function ProfileView({ data, now, onLeaveToggle, onHeadphoneChange, onImport, onReset }) {
-  const fileInput = useRef(null)
+export function ProfileView({
+  data,
+  now,
+  onLeaveToggle,
+  onHeadphoneChange,
+  onExport,
+  importAction,
+  onReset,
+  storageDescription,
+}) {
   const rates = getRates(data.settings)
   const year = now.getFullYear()
   let elapsedWorkdays = 0
   for (let month = 0; month <= now.getMonth(); month += 1) {
     const through = month === now.getMonth() ? now : null
     elapsedWorkdays += countWorkdays(year, month, data.attendance, through)
-  }
-
-  async function importFile(event) {
-    const [file] = event.target.files || []
-    if (!file) return
-    try {
-      onImport(JSON.parse(await file.text()))
-    } catch {
-      window.alert('这个文件不是有效的千薪万苦数据。')
-    }
-    event.target.value = ''
   }
 
   return (
@@ -42,7 +28,13 @@ export function ProfileView({ data, now, onLeaveToggle, onHeadphoneChange, onImp
         <p>这些数据只留在当前设备，不上传云端，也不需要账号。</p>
       </div>
 
-      <LeaveTimer session={data.leaveSession} now={now} settings={data.settings} onToggle={onLeaveToggle} />
+      <LeaveTimer
+        session={data.leaveSession}
+        now={now}
+        settings={data.settings}
+        attendance={data.attendance}
+        onToggle={onLeaveToggle}
+      />
 
       <section className="profile-section headphone-section">
         <p className="micro-label">COST PER USE</p>
@@ -71,14 +63,13 @@ export function ProfileView({ data, now, onLeaveToggle, onHeadphoneChange, onImp
           <span className="local-icon"><Icon name="database" /></span>
           <div>
             <h2>本地数据</h2>
-            <p>参数、项目和统计使用 localStorage 保存；应用外壳会缓存以便再次打开或离线使用。</p>
+            <p>{storageDescription}</p>
           </div>
         </div>
         <div className="data-actions">
-          <button className="secondary-button" type="button" onClick={() => downloadJson(data)}><Icon name="download" size={18} />导出备份</button>
-          <button className="secondary-button" type="button" onClick={() => fileInput.current?.click()}><Icon name="upload" size={18} />导入备份</button>
+          <button className="secondary-button" type="button" onClick={onExport}><Icon name="download" size={18} />导出备份</button>
+          {importAction}
           <button className="danger-button" type="button" onClick={onReset}><Icon name="trash" size={18} />清空本机数据</button>
-          <input ref={fileInput} className="sr-only" type="file" accept="application/json" onChange={importFile} />
         </div>
       </section>
     </div>

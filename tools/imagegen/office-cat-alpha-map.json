@@ -1,0 +1,37 @@
+{
+  "target_size": 512,
+  "default_occupy": 0.92,
+  "checker_colors": null,
+  "icons": [
+    {
+      "name": "office-cat-before-work.png",
+      "source": "office-cat-before-work-draft.png",
+      "kind": "topbar"
+    },
+    {
+      "name": "office-cat-working.png",
+      "source": "office-cat-working-draft.png",
+      "kind": "topbar"
+    },
+    {
+      "name": "office-cat-paid-leave.png",
+      "source": "office-cat-paid-leave-draft.png",
+      "kind": "topbar"
+    },
+    {
+      "name": "office-cat-lunch.png",
+      "source": "office-cat-lunch-draft.png",
+      "kind": "topbar"
+    },
+    {
+      "name": "office-cat-after-work.png",
+      "source": "office-cat-after-work-draft.png",
+      "kind": "topbar"
+    },
+    {
+      "name": "office-cat-rest-day.png",
+      "source": "office-cat-rest-day-draft.png",
+      "kind": "topbar"
+    }
+  ]
+}

@@ -1,12 +1,19 @@
 import { Icon } from '../components/Icons'
 import { LeaveTimer } from '../components/LeaveTimer'
-import { formatDuration, formatMoney, getRates, getWorkSnapshot } from '../lib/time'
+import {
+  formatDuration,
+  formatMoney,
+  getRates,
+  getWorkSnapshot,
+  shouldShowWorkCountdown,
+} from '../lib/time'
 
 export function TodayView({ data, now, onLeaveToggle, onNavigate }) {
   const snapshot = getWorkSnapshot(now, data.settings, data.attendance)
   const rates = getRates(data.settings)
   const coffeeCount = snapshot.earnings / 15
   const endDayLabel = Number(data.settings.endDayOffset) === 1 ? ' +1天' : ''
+  const showCountdown = shouldShowWorkCountdown(snapshot.phase)
 
   return (
     <div className="view-stack today-view">
@@ -17,7 +24,9 @@ export function TodayView({ data, now, onLeaveToggle, onNavigate }) {
       <section className="hero-panel">
         <div className="status-line"><span className="status-dot" />{snapshot.status}</div>
         <div className="countdown-wrap">
-          <strong className="countdown">{formatDuration(snapshot.countdownSeconds)}</strong>
+          {showCountdown ? (
+            <strong className="countdown">{formatDuration(snapshot.countdownSeconds)}</strong>
+          ) : null}
           <span>{snapshot.statusDetail}</span>
         </div>
         <div className="shift-meter">
@@ -55,6 +64,7 @@ export function TodayView({ data, now, onLeaveToggle, onNavigate }) {
         session={data.leaveSession}
         now={now}
         settings={data.settings}
+        attendance={data.attendance}
         onToggle={onLeaveToggle}
       />
     </div>

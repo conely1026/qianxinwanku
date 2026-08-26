@@ -27,6 +27,81 @@ test('keeps the same leave period through midnight until the next shift starts',
   )
 })
 
+test('keeps Friday leave totals through the weekend and resets on Monday start', () => {
+  const session = {
+    running: false,
+    startedAt: null,
+    accumulatedSeconds: 900,
+    periodStartedAt: timestamp(2026, 8, 28, 10),
+  }
+
+  assert.equal(
+    reconcileLeaveSession(session, new Date(2026, 7, 30, 16), settings),
+    session,
+  )
+  assert.equal(
+    reconcileLeaveSession(session, new Date(2026, 7, 31, 9, 59, 59), settings),
+    session,
+  )
+  assert.deepEqual(
+    reconcileLeaveSession(session, new Date(2026, 7, 31, 10), settings),
+    {
+      running: false,
+      startedAt: null,
+      accumulatedSeconds: 0,
+      periodStartedAt: timestamp(2026, 8, 31, 10),
+    },
+  )
+})
+
+test('skips a manually rested weekday before resetting leave totals', () => {
+  const attendance = { '2026-08-31': 'rest' }
+  const session = {
+    running: false,
+    startedAt: null,
+    accumulatedSeconds: 600,
+    periodStartedAt: timestamp(2026, 8, 28, 10),
+  }
+
+  assert.equal(
+    reconcileLeaveSession(session, new Date(2026, 7, 31, 18), settings, attendance),
+    session,
+  )
+  assert.deepEqual(
+    reconcileLeaveSession(session, new Date(2026, 8, 1, 10), settings, attendance),
+    {
+      running: false,
+      startedAt: null,
+      accumulatedSeconds: 0,
+      periodStartedAt: timestamp(2026, 9, 1, 10),
+    },
+  )
+})
+
+test('resets on a weekend day manually marked as work', () => {
+  const attendance = { '2026-08-29': 'work' }
+  const session = {
+    running: false,
+    startedAt: null,
+    accumulatedSeconds: 600,
+    periodStartedAt: timestamp(2026, 8, 28, 10),
+  }
+
+  assert.equal(
+    reconcileLeaveSession(session, new Date(2026, 7, 29, 9, 59, 59), settings, attendance),
+    session,
+  )
+  assert.deepEqual(
+    reconcileLeaveSession(session, new Date(2026, 7, 29, 10), settings, attendance),
+    {
+      running: false,
+      startedAt: null,
+      accumulatedSeconds: 0,
+      periodStartedAt: timestamp(2026, 8, 29, 10),
+    },
+  )
+})
+
 test('resets a paused leave session exactly at the next shift start', () => {
   const previousPeriod = timestamp(2026, 8, 26, 10)
   const session = {
@@ -66,6 +141,29 @@ test('stops a running timer when the next shift resets it', () => {
       startedAt: null,
       accumulatedSeconds: 0,
       periodStartedAt: timestamp(2026, 8, 27, 10),
+    },
+  )
+})
+
+test('resets a restored running session after the next actual workday starts', () => {
+  const restoredSession = {
+    running: true,
+    startedAt: timestamp(2026, 8, 28, 23),
+    accumulatedSeconds: 300,
+    periodStartedAt: timestamp(2026, 8, 28, 10),
+  }
+
+  assert.equal(
+    reconcileLeaveSession(restoredSession, new Date(2026, 7, 31, 9, 59), settings),
+    restoredSession,
+  )
+  assert.deepEqual(
+    reconcileLeaveSession(restoredSession, new Date(2026, 7, 31, 10), settings),
+    {
+      running: false,
+      startedAt: null,
+      accumulatedSeconds: 0,
+      periodStartedAt: timestamp(2026, 8, 31, 10),
     },
   )
 })

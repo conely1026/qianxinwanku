@@ -1,13 +1,19 @@
-import { timeOnDate } from './time.js'
+import { isWorkday, timeOnDate } from './time.js'
 
-export function getLeavePeriodStart(now, settings) {
-  const periodStart = timeOnDate(now, settings.startTime)
-  if (now < periodStart) periodStart.setDate(periodStart.getDate() - 1)
-  return periodStart
+export function getLeavePeriodStart(now, settings, attendance = {}) {
+  const periodDate = new Date(now)
+  const todayStart = timeOnDate(periodDate, settings.startTime)
+  if (now < todayStart) periodDate.setDate(periodDate.getDate() - 1)
+
+  while (!isWorkday(periodDate, attendance)) {
+    periodDate.setDate(periodDate.getDate() - 1)
+  }
+
+  return timeOnDate(periodDate, settings.startTime)
 }
 
-export function reconcileLeaveSession(session, now, settings) {
-  const periodStartedAt = getLeavePeriodStart(now, settings).getTime()
+export function reconcileLeaveSession(session, now, settings, attendance = {}) {
+  const periodStartedAt = getLeavePeriodStart(now, settings, attendance).getTime()
   const storedPeriodStartedAt = Number(session.periodStartedAt)
 
   if (!Number.isFinite(storedPeriodStartedAt)) {
@@ -24,8 +30,8 @@ export function reconcileLeaveSession(session, now, settings) {
   }
 }
 
-export function rebaseLeaveSessionPeriod(session, now, settings) {
-  const periodStartedAt = getLeavePeriodStart(now, settings).getTime()
+export function rebaseLeaveSessionPeriod(session, now, settings, attendance = {}) {
+  const periodStartedAt = getLeavePeriodStart(now, settings, attendance).getTime()
   if (Number(session.periodStartedAt) === periodStartedAt) return session
   return { ...session, periodStartedAt }
 }

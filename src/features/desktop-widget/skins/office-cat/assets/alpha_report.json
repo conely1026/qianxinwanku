@@ -1,0 +1,92 @@
+{
+  "office-cat-after-work.png": {
+    "format": "PNG",
+    "mode": "RGBA",
+    "size": [
+      512,
+      512
+    ],
+    "has_alpha": true,
+    "bits_per_pixel": 32,
+    "min_alpha": 0,
+    "max_alpha": 255,
+    "nonzero_alpha_pixels": 75164,
+    "border_max_alpha": 0,
+    "border_alpha_all_zero": true
+  },
+  "office-cat-before-work.png": {
+    "format": "PNG",
+    "mode": "RGBA",
+    "size": [
+      512,
+      512
+    ],
+    "has_alpha": true,
+    "bits_per_pixel": 32,
+    "min_alpha": 0,
+    "max_alpha": 255,
+    "nonzero_alpha_pixels": 120030,
+    "border_max_alpha": 0,
+    "border_alpha_all_zero": true
+  },
+  "office-cat-lunch.png": {
+    "format": "PNG",
+    "mode": "RGBA",
+    "size": [
+      512,
+      512
+    ],
+    "has_alpha": true,
+    "bits_per_pixel": 32,
+    "min_alpha": 0,
+    "max_alpha": 255,
+    "nonzero_alpha_pixels": 94726,
+    "border_max_alpha": 0,
+    "border_alpha_all_zero": true
+  },
+  "office-cat-paid-leave.png": {
+    "format": "PNG",
+    "mode": "RGBA",
+    "size": [
+      512,
+      512
+    ],
+    "has_alpha": true,
+    "bits_per_pixel": 32,
+    "min_alpha": 0,
+    "max_alpha": 255,
+    "nonzero_alpha_pixels": 127709,
+    "border_max_alpha": 0,
+    "border_alpha_all_zero": true
+  },
+  "office-cat-rest-day.png": {
+    "format": "PNG",
+    "mode": "RGBA",
+    "size": [
+      512,
+      512
+    ],
+    "has_alpha": true,
+    "bits_per_pixel": 32,
+    "min_alpha": 0,
+    "max_alpha": 255,
+    "nonzero_alpha_pixels": 118689,
+    "border_max_alpha": 0,
+    "border_alpha_all_zero": true
+  },
+  "office-cat-working.png": {
+    "format": "PNG",
+    "mode": "RGBA",
+    "size": [
+      512,
+      512
+    ],
+    "has_alpha": true,
+    "bits_per_pixel": 32,
+    "min_alpha": 0,
+    "max_alpha": 255,
+    "nonzero_alpha_pixels": 133085,
+    "border_max_alpha": 0,
+    "border_alpha_all_zero": true
+  }
+}
