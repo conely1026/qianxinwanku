@@ -204,6 +204,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .year-metrics div { padding-left: 18px; border-left: 3px solid var(--acid); }
 .year-metrics dt { color: var(--muted); font-size: 12px; }
 .year-metrics dd { margin: 13px 0 0; font: 500 clamp(25px, 4vw, 42px)/1 var(--serif); }
+.desktop-download-section { display: flex; justify-content: space-between; align-items: center; gap: 35px; }
+.desktop-download-copy { max-width: 680px; }
+.desktop-download-copy h2 { margin-top: 13px; }
+.desktop-download-copy p:last-child { margin-bottom: 0; line-height: 1.65; }
+.desktop-download-button { flex: 0 0 auto; text-decoration: none; white-space: nowrap; }
+.desktop-download-button:focus-visible { outline: 3px solid var(--acid); outline-offset: 3px; }
 .local-section { display: flex; justify-content: space-between; gap: 35px; align-items: center; }
 .local-copy { max-width: 650px; display: flex; gap: 20px; align-items: flex-start; }
 .local-copy h2 { margin-top: 0; }
@@ -278,6 +284,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .headphone-form { grid-template-columns: 1fr 1fr; }
   .headphone-form strong { grid-column: 1 / -1; }
   .year-metrics { grid-template-columns: 1fr; }
+  .desktop-download-section { flex-direction: column; align-items: stretch; }
+  .desktop-download-button { align-self: flex-start; white-space: normal; }
   .local-section { flex-direction: column; align-items: stretch; }
   .data-actions { justify-content: flex-start; }
   .settings-modal { padding: 26px 20px; border-radius: 23px; }

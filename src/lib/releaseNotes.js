@@ -62,6 +62,17 @@ export const RELEASE_HISTORY = [
       },
     ],
   },
+  {
+    id: '2026-08-27-01',
+    label: '2026.08.27 · 01',
+    channel: RELEASE_CHANNELS.WEB,
+    highlights: [
+      {
+        title: '桌面版可以直接下载',
+        description: '“我的”页面新增 Windows 桌面版入口，会自动打开最新的 GitHub Release。',
+      },
+    ],
+  },
 ]
 
 export const CURRENT_RELEASE = RELEASE_HISTORY.at(-1)

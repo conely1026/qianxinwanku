@@ -13,6 +13,7 @@ import {
   WEB_STORAGE_DESCRIPTION,
 } from './platform/web/webAppActions.js'
 import { WebBackupImportAction } from './platform/web/WebBackupImportAction.jsx'
+import { WebDesktopDownloadAction } from './platform/web/WebDesktopDownloadAction.jsx'
 import { webBackupAdapter } from './platform/web/webBackup.js'
 import { webClock } from './platform/web/webClock.js'
 import { useWebAppEffects } from './platform/web/useWebAppEffects.js'
@@ -93,6 +94,7 @@ export function App() {
         onHeadphoneChange={actions.updateHeadphone}
         onExport={exportBackup}
         importAction={<WebBackupImportAction onImportFile={importBackup} />}
+        desktopDownloadAction={<WebDesktopDownloadAction />}
         onReset={resetData}
         storageDescription={WEB_STORAGE_DESCRIPTION}
       />

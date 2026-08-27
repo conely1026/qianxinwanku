@@ -160,6 +160,7 @@ test('Web backup import propagates unknown adapter and app errors without showin
 test('Profile feature remains platform-neutral while the Web shell injects backup capabilities', () => {
   const profileSource = readFileSync(new URL('../../views/ProfileView.jsx', import.meta.url), 'utf8')
   const importActionSource = readFileSync(new URL('./WebBackupImportAction.jsx', import.meta.url), 'utf8')
+  const downloadActionSource = readFileSync(new URL('./WebDesktopDownloadAction.jsx', import.meta.url), 'utf8')
   const appSource = readFileSync(new URL('../../App.jsx', import.meta.url), 'utf8')
 
   for (const forbidden of ['new Blob', 'URL.createObjectURL', 'document.createElement', 'window.alert', 'file.text', 'localStorage']) {
@@ -171,6 +172,10 @@ test('Profile feature remains platform-neutral while the Web shell injects backu
   assert.match(importActionSource, /finally\s*{\s*input\.value = ''\s*}/)
   assert.match(appSource, /backupAdapter:\s*webBackupAdapter/)
   assert.match(appSource, /onInvalidFile:\s*alertInvalidWebBackup/)
+  assert.match(appSource, /desktopDownloadAction={<WebDesktopDownloadAction \/>}/)
+  assert.match(downloadActionSource, /https:\/\/github\.com\/conely1026\/qianxinwanku\/releases\/latest/)
+  assert.match(downloadActionSource, /target="_blank"/)
+  assert.equal(profileSource.includes('github.com'), false)
   assert.match(appSource, /storageDescription={WEB_STORAGE_DESCRIPTION}/)
   assert.match(appSource, /storageNote={WEB_RELEASE_STORAGE_NOTE}/)
   assert.equal(WEB_STORAGE_DESCRIPTION.includes('localStorage'), true)

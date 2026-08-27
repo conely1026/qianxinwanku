@@ -9,6 +9,7 @@ export function ProfileView({
   onHeadphoneChange,
   onExport,
   importAction,
+  desktopDownloadAction,
   onReset,
   storageDescription,
 }) {
@@ -57,6 +58,17 @@ export function ProfileView({
           <div><dt>每秒价格</dt><dd>{formatMoney(rates.second)}</dd></div>
         </dl>
       </section>
+
+      {desktopDownloadAction ? (
+        <section className="profile-section desktop-download-section">
+          <div className="desktop-download-copy">
+            <p className="micro-label">WINDOWS DESKTOP</p>
+            <h2>把下班倒计时放到桌面上。</h2>
+            <p className="muted">Windows x64 便携版，无需安装；新版本统一从 GitHub Releases 获取。</p>
+          </div>
+          {desktopDownloadAction}
+        </section>
+      ) : null}
 
       <section className="profile-section local-section">
         <div className="local-copy">
